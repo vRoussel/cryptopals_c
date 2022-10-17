@@ -6,6 +6,7 @@ project(cryptopals
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+add_subdirectory(external_libs)
 add_subdirectory(libs)
 
 include_directories(libs)
