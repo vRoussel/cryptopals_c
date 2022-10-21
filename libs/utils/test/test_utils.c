@@ -71,6 +71,16 @@ void test_hex_to_base64_cryptopals()
     TEST_ASSERT_EQUAL_STRING(tmp, "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t");
 }
 
+void test_xor_cryptopals()
+{
+    char *hex1 = "1c0111001f010100061a024b53535009181c";
+    char *hex2 = "686974207468652062756c6c277320657965";
+    char tmp[512];
+    ssize_t ret = xor(hex1, hex2, tmp);
+    TEST_ASSERT_EQUAL_INT(ret, 36);
+    TEST_ASSERT_EQUAL_STRING(tmp, "746865206B696420646F6E277420706C6179");
+}
+
 
 int main()
 {
@@ -80,5 +90,6 @@ int main()
     RUN_TEST(test_hex_to_base64_empty);
     RUN_TEST(test_hex_to_base64_wrong_hex);
     RUN_TEST(test_hex_to_base64_cryptopals);
+    RUN_TEST(test_xor_cryptopals);
     return UNITY_END();
 }
