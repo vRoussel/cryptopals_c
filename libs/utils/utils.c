@@ -140,3 +140,30 @@ error:
     return ret;
 }
 
+ssize_t xor(char *left, char *right, char *output)
+{
+    size_t left_len = strlen(left);
+    size_t right_len = strlen(right);
+
+    if (left_len != right_len)
+        return -1;
+
+    size_t len = left_len;
+    size_t max_bytes = (len + 1) / 2; //+1 in case len is odd
+
+    uint8_t left_bytes[max_bytes];
+    uint8_t right_bytes[max_bytes];
+    ssize_t left_ret = decode_hex(left, left_bytes);
+    ssize_t right_ret = decode_hex(right, right_bytes);
+
+    if (left_ret < 0 || right_ret < 0 || left_ret != right_ret)
+        return -1;
+
+    size_t bytes_len = left_ret;
+    uint8_t xor_bytes[bytes_len];
+    for (size_t i = 0; i < bytes_len; i++) {
+        xor_bytes[i] = left_bytes[i] ^ right_bytes[i];
+    }
+
+    return encode_hex(xor_bytes, bytes_len, output);
+}
