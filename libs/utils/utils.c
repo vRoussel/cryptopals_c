@@ -69,6 +69,24 @@ error:
     return ret;
 }
 
+ssize_t encode_hex(uint8_t *input, size_t input_len, char *output)
+{
+    size_t output_len = 0;
+    for (size_t i = 0; i < input_len; i++) {
+        uint8_t b = input[i];
+        uint8_t b1 = (b & 0xF0) >> 4;
+        uint8_t b2 = b & 0x0F;
+        char c1 = byte_to_hex_char(b1);
+        char c2 = byte_to_hex_char(b2);
+        if (c1 < 0 || c2 < 0)
+            return -1;
+        output[output_len++] = c1;
+        output[output_len++] = c2;
+    }
+    output[output_len] = '\0';
+    return output_len;
+}
+
 ssize_t hex_to_base64(char *input, char *output)
 {
     int ret = 0;
