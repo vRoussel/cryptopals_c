@@ -25,7 +25,6 @@ int8_t hex_char_to_byte(char c)
         return -1;
 }
 
-int hex_to_base64(char *input, char *output)
 char byte_to_hex_char(uint8_t b)
 {
     if (b > 15)
@@ -35,27 +34,57 @@ char byte_to_hex_char(uint8_t b)
     else
         return 'A' + b - 10;
 }
+
+ssize_t decode_hex(char *input, uint8_t *output)
+{
+    int ret = 0;
     size_t input_len = strlen(input);
-    size_t max_bytes = (input_len + 1) / 2; // 1 byte == 2 hex char; +1 in case input_len is odd
-    max_bytes += 2; // in case we need padding
-    uint8_t *bytes = malloc(sizeof(uint8_t) * max_bytes);
-    size_t bytes_len = 0;
+    size_t output_len = 0;
 
     // If odd number of hex digits, prepend with 0
     if (input_len % 2 == 1) {
-        bytes[bytes_len++] = hex_char_to_byte(*input++);
+        int8_t b = hex_char_to_byte(*input++);
+        if (b < 0) {
+            ret = -1;
+            goto error;
+        }
+        output[output_len++] = hex_char_to_byte(*input++);
         input_len--;
     }
 
     assert(input_len % 2 == 0);
     while (input_len >= 2) {
-        uint8_t l = hex_char_to_byte(*input++) << 4;
-        uint8_t r = hex_char_to_byte(*input++);
-        bytes[bytes_len++] = l | r;
+        int8_t l = hex_char_to_byte(*input++) << 4;
+        int8_t r = hex_char_to_byte(*input++);
+        if (l < 0 || r < 0) {
+            ret = -1;
+            goto error;
+        }
+        output[output_len++] = l | r;
         input_len -= 2;
     }
+    ret = output_len;
 
+error:
+    return ret;
+}
+
+ssize_t hex_to_base64(char *input, char *output)
+{
+    int ret = 0;
     size_t output_len = 0;
+    size_t input_len = strlen(input);
+    size_t max_bytes = (input_len + 1) / 2; // 1 byte == 2 hex char; +1 in case input_len is odd
+    max_bytes += 2; // in case we need padding
+    uint8_t *bytes = malloc(sizeof(uint8_t) * max_bytes);
+
+    ssize_t tmp = decode_hex(input, bytes);
+    if (tmp < 0) {
+        ret = -1;
+        goto error;
+    }
+    size_t bytes_len = (size_t)tmp;
+
     size_t bytes_i = 0;
     while (bytes_i + 3 <= bytes_len) {
         uint8_t b1 = bytes[bytes_i++];
@@ -68,7 +97,7 @@ char byte_to_hex_char(uint8_t b)
     }
 
     size_t remaining = bytes_len - bytes_i;
-    assert(remaining >= 0 && remaining < 3);
+    assert(remaining < 3);
     if (remaining == 2) {
         uint8_t b1 = bytes[bytes_i++];
         uint8_t b2 = bytes[bytes_i++];
@@ -83,11 +112,13 @@ char byte_to_hex_char(uint8_t b)
         output[output_len++] = '=';
         output[output_len++] = '=';
     }
-    output[output_len++] = '\0';
     assert(bytes_i == bytes_len);
-    assert((output_len - 1) % 4 == 0);
+    assert((output_len) % 4 == 0);
+    ret = output_len;
 
+error:
+    output[output_len] = '\0';
     free(bytes);
-    return output_len - 1;
+    return ret;
 }
 
