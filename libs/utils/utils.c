@@ -26,7 +26,15 @@ int8_t hex_char_to_byte(char c)
 }
 
 int hex_to_base64(char *input, char *output)
+char byte_to_hex_char(uint8_t b)
 {
+    if (b > 15)
+        return -1;
+    else if (b < 10)
+        return '0' + b;
+    else
+        return 'A' + b - 10;
+}
     size_t input_len = strlen(input);
     size_t max_bytes = (input_len + 1) / 2; // 1 byte == 2 hex char; +1 in case input_len is odd
     max_bytes += 2; // in case we need padding
