@@ -48,19 +48,19 @@ ssize_t decode_hex(char *input, uint8_t *output)
             ret = -1;
             goto error;
         }
-        output[output_len++] = hex_char_to_byte(*input++);
+        output[output_len++] = b;
         input_len--;
     }
 
     assert(input_len % 2 == 0);
     while (input_len >= 2) {
-        int8_t l = hex_char_to_byte(*input++) << 4;
+        int8_t l = hex_char_to_byte(*input++);
         int8_t r = hex_char_to_byte(*input++);
         if (l < 0 || r < 0) {
             ret = -1;
             goto error;
         }
-        output[output_len++] = l | r;
+        output[output_len++] = ((uint8_t)l) << 4 | (uint8_t)r;
         input_len -= 2;
     }
     ret = output_len;
