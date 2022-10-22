@@ -140,7 +140,7 @@ error:
     return ret;
 }
 
-ssize_t xor(char *left, char *right, char *output)
+ssize_t xor_hex(char *left, char *right, char *output)
 {
     size_t left_len = strlen(left);
     size_t right_len = strlen(right);
