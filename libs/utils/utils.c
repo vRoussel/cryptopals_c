@@ -163,28 +163,36 @@ ssize_t xor_hex(char *left, char *right, char *output)
     size_t left_bytes_len = left_ret;
     size_t right_bytes_len = right_ret;
     uint8_t xor_bytes[max(left_bytes_len, right_bytes_len)];
-    size_t left_bytes_i = 0;
-    size_t right_bytes_i = 0;
-    size_t xor_bytes_len = 0;
+    ssize_t xor_ret = xor(left_bytes, left_bytes_len, right_bytes, right_bytes_len, xor_bytes);
+    if (xor_ret < 0)
+        return -1;
+    size_t xor_bytes_len = xor_ret;
+    return encode_hex(xor_bytes, xor_bytes_len, output);
+}
+
+ssize_t xor(uint8_t *left, size_t left_len, uint8_t *right, size_t right_len, uint8_t *output)
+{
+    size_t left_i = 0;
+    size_t right_i = 0;
+    size_t output_len = 0;
 
     // Consume the longest byte array until both have same length
-    size_t remaining_bytes_left = left_bytes_len - left_bytes_i;
-    size_t remaining_bytes_right = right_bytes_len - right_bytes_i;
+    size_t remaining_bytes_left = left_len - left_i;
+    size_t remaining_bytes_right = right_len - right_i;
     while (remaining_bytes_left < remaining_bytes_right) {
-        xor_bytes[xor_bytes_len++] = right_bytes[right_bytes_i++];
+        output[output_len++] = right[right_i++];
         remaining_bytes_right--;
     }
     while (remaining_bytes_right < remaining_bytes_left) {
-        xor_bytes[xor_bytes_len++] = right_bytes[left_bytes_i++];
+        output[output_len++] = right[left_i++];
         remaining_bytes_left--;
     }
     assert(remaining_bytes_left == remaining_bytes_right);
 
-    while(left_bytes_i < left_bytes_len) {
-        xor_bytes[xor_bytes_len++] = left_bytes[left_bytes_i++] ^ right_bytes[right_bytes_i++];
+    while(left_i < left_len) {
+        output[output_len++] = left[left_i++] ^ right[right_i++];
     }
-    assert(left_bytes_i == left_bytes_len);
-    assert(right_bytes_i == right_bytes_len);
-
-    return encode_hex(xor_bytes, xor_bytes_len, output);
+    assert(left_i == left_len);
+    assert(right_i == right_len);
+    return output_len;
 }
