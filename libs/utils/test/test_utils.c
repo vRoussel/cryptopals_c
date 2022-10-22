@@ -75,13 +75,14 @@ void test_xor()
     TEST_ASSERT_EQUAL_INT(ret, 36);
     TEST_ASSERT_EQUAL_STRING(tmp, "746865206B696420646F6E277420706C6179");
 
-    hex1 = "110";
-    hex1 = "abaa";
+    hex1 = "001101";
+    hex2 = "ABAACC";
     ret = xor_hex(hex1, hex2, tmp);
-    TEST_ASSERT_EQUAL_INT(ret, -1);
+    TEST_ASSERT_EQUAL_INT(ret, 6);
+    TEST_ASSERT_EQUAL_STRING(tmp, "ABBBCD");
 
-    hex1 = "110g";
-    hex1 = "abaa";
+    hex1 = "110G";
+    hex2 = "ABAA";
     ret = xor_hex(hex1, hex2, tmp);
     TEST_ASSERT_EQUAL_INT(ret, -1);
 }
