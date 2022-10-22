@@ -47,38 +47,43 @@ void test_byte_to_hex_char()
     TEST_ASSERT_EQUAL_CHAR(byte_to_hex_char(16), -1);
 }
 
-void test_hex_to_base64_wrong_hex()
+void test_hex_to_base64()
 {
     char tmp[512];
-    int ret = hex_to_base64("AAG", tmp);
+    int ret;
+    ret = hex_to_base64("AAG", tmp);
     TEST_ASSERT_EQUAL_INT(ret, -1);
     TEST_ASSERT_EQUAL_STRING(tmp, "");
-}
 
-void test_hex_to_base64_empty()
-{
-    char tmp[512];
-    int ret = hex_to_base64("", tmp);
+    ret = hex_to_base64("", tmp);
     TEST_ASSERT_EQUAL_INT(ret, 0);
     TEST_ASSERT_EQUAL_STRING(tmp, "");
-}
 
-void test_hex_to_base64_cryptopals()
-{
-    char tmp[512];
-    int ret = hex_to_base64("49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d", tmp);
+    ret = hex_to_base64("49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d", tmp);
     TEST_ASSERT_EQUAL_INT(ret, 64);
     TEST_ASSERT_EQUAL_STRING(tmp, "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t");
 }
 
-void test_xor_cryptopals()
+void test_xor()
 {
     char *hex1 = "1c0111001f010100061a024b53535009181c";
     char *hex2 = "686974207468652062756c6c277320657965";
     char tmp[512];
-    ssize_t ret = xor(hex1, hex2, tmp);
+    ssize_t ret;
+
+    ret = xor(hex1, hex2, tmp);
     TEST_ASSERT_EQUAL_INT(ret, 36);
     TEST_ASSERT_EQUAL_STRING(tmp, "746865206B696420646F6E277420706C6179");
+
+    hex1 = "110";
+    hex1 = "abaa";
+    ret = xor(hex1, hex2, tmp);
+    TEST_ASSERT_EQUAL_INT(ret, -1);
+
+    hex1 = "110g";
+    hex1 = "abaa";
+    ret = xor(hex1, hex2, tmp);
+    TEST_ASSERT_EQUAL_INT(ret, -1);
 }
 
 
@@ -87,9 +92,7 @@ int main()
     UNITY_BEGIN();
     RUN_TEST(test_hex_char_to_byte);
     RUN_TEST(test_byte_to_hex_char);
-    RUN_TEST(test_hex_to_base64_empty);
-    RUN_TEST(test_hex_to_base64_wrong_hex);
-    RUN_TEST(test_hex_to_base64_cryptopals);
-    RUN_TEST(test_xor_cryptopals);
+    RUN_TEST(test_hex_to_base64);
+    RUN_TEST(test_xor);
     return UNITY_END();
 }
