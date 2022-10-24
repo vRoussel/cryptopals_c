@@ -44,9 +44,11 @@ void test_decipher_single_byte_xor()
     char *ciphered = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
     char tmp[512];
     ssize_t ret;
+    uint8_t key;
 
-    ret = decipher_single_byte_xor(ciphered, tmp);
+    ret = decipher_single_byte_xor(ciphered, tmp, &key);
     TEST_ASSERT_EQUAL_INT(ret, 34);
+    TEST_ASSERT_EQUAL_INT(key, 88);
     TEST_ASSERT_EQUAL_STRING(tmp, "Cooking MC's like a pound of bacon");
 }
 
