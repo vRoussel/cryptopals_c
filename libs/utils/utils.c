@@ -226,6 +226,19 @@ ssize_t xor(uint8_t *left, size_t left_len, uint8_t *right, size_t right_len, ui
     return output_len;
 }
 
+ssize_t xor_repeated_key(uint8_t *input, size_t input_len, uint8_t *key, size_t key_len, uint8_t *output)
+{
+    size_t input_i = 0;
+    size_t key_i = 0;
+    size_t output_len = 0;
+
+    while (input_i < input_len) {
+        output[output_len++] = input[input_i++] ^ key[key_i++];
+        key_i %= key_len;
+    }
+    return output_len;
+}
+
 
 unsigned int english_score(char *input)
 {
