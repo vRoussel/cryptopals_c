@@ -20,6 +20,7 @@ add_compile_options(
 set(BUILD_SHARED_LIBS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+set(CMAKE_CTEST_ARGUMENTS "--output-on-failure")
 enable_testing()
 
 add_subdirectory(external_libs)
