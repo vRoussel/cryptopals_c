@@ -5,9 +5,11 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
+#include <limits.h>
 
 #define MAX(a,b) ((a) > (b) ? (a) : (b))
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
+#define SWAP(x, y, T) do { T SWAP = x; x = y; y = SWAP; } while (0)
 
 double english_letters_freq[] = {
     8.4966,  //a
@@ -239,6 +241,42 @@ ssize_t xor_repeated_key(uint8_t *input, size_t input_len, uint8_t *key, size_t 
     return output_len;
 }
 
+ssize_t decipher_single_byte_xor(char *input_hex, char *output)
+{
+    size_t len = strlen(input_hex);
+    size_t max_bytes = (len + 1) / 2; //+1 in case len is odd
+
+    uint8_t bytes[max_bytes];
+    ssize_t bytes_ret = decode_hex(input_hex, bytes);
+    if (bytes_ret < 1)
+        return -1;
+
+    size_t bytes_len = bytes_ret;
+
+    char buf1[len];
+    char buf2[len];
+    char *storage = buf1;
+    char *best_match = buf2;
+    unsigned int best_score = 100;
+    ssize_t ret = -1;
+    for (uint16_t i = 0; i <= UINT8_MAX; i++) {
+        uint8_t key = i;
+        ssize_t xor_ret = xor_repeated_key(bytes, bytes_len, &key, 1, (uint8_t*)storage);
+        if (xor_ret >= 0) {
+            unsigned int score = english_score(storage);
+            if (score < best_score) {
+                best_score = score;
+                ret = xor_ret;
+                SWAP(best_match, storage, char*);
+            }
+        }
+    }
+    if (ret >= 0) {
+        memcpy(output, best_match, ret);
+        output[ret] = '\0';
+    }
+    return ret;
+}
 
 unsigned int english_score(char *input)
 {
