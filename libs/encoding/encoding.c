@@ -85,10 +85,45 @@ ssize_t encode_hex(uint8_t *input, size_t input_len, char *output)
     return output_len;
 }
 
+ssize_t encode_b64(uint8_t *input, uint8_t input_len, char *output)
+{
+    size_t output_len = 0;
+    size_t input_i = 0;
+    while (input_i + 3 <= input_len) {
+        uint8_t b1 = input[input_i++];
+        uint8_t b2 = input[input_i++];
+        uint8_t b3 = input[input_i++];
+        output[output_len++] = b64_char[(b1 & 0xFC) >> 2];
+        output[output_len++] = b64_char[(b1 & 0x03) << 4 | (b2 & 0xF0) >> 4];
+        output[output_len++] = b64_char[(b2 & 0x0F) << 2 | (b3 & 0xC0) >> 6];
+        output[output_len++] = b64_char[b3 & 0x3F];
+    }
+
+    size_t remaining = input_len - input_i;
+    assert(remaining < 3);
+    if (remaining == 2) {
+        uint8_t b1 = input[input_i++];
+        uint8_t b2 = input[input_i++];
+        output[output_len++] = b64_char[(b1 & 0xFC) >> 2];
+        output[output_len++] = b64_char[(b1 & 0x03) << 4 | (b2 & 0xF0) >> 4];
+        output[output_len++] = b64_char[(b2 & 0x0F) << 2];
+        output[output_len++] = '=';
+    } else if (remaining == 1) {
+        uint8_t b1 = input[input_i++];
+        output[output_len++] = b64_char[(b1 & 0xFC) >> 2];
+        output[output_len++] = b64_char[(b1 & 0x03) << 4];
+        output[output_len++] = '=';
+        output[output_len++] = '=';
+    }
+    assert(input_i == input_len);
+    assert((output_len) % 4 == 0);
+    output[output_len] = '\0';
+    return output_len;
+}
+
 ssize_t hex_to_base64(char *input, char *output)
 {
     int ret = 0;
-    size_t output_len = 0;
     size_t input_len = strlen(input);
     size_t max_bytes = (input_len + 1) / 2; // 1 byte == 2 hex char; +1 in case input_len is odd
     max_bytes += 2; // in case we need padding
@@ -100,40 +135,9 @@ ssize_t hex_to_base64(char *input, char *output)
         goto error;
     }
     size_t bytes_len = (size_t)tmp;
-
-    size_t bytes_i = 0;
-    while (bytes_i + 3 <= bytes_len) {
-        uint8_t b1 = bytes[bytes_i++];
-        uint8_t b2 = bytes[bytes_i++];
-        uint8_t b3 = bytes[bytes_i++];
-        output[output_len++] = b64_char[(b1 & 0xFC) >> 2];
-        output[output_len++] = b64_char[(b1 & 0x03) << 4 | (b2 & 0xF0) >> 4];
-        output[output_len++] = b64_char[(b2 & 0x0F) << 2 | (b3 & 0xC0) >> 6];
-        output[output_len++] = b64_char[b3 & 0x3F];
-    }
-
-    size_t remaining = bytes_len - bytes_i;
-    assert(remaining < 3);
-    if (remaining == 2) {
-        uint8_t b1 = bytes[bytes_i++];
-        uint8_t b2 = bytes[bytes_i++];
-        output[output_len++] = b64_char[(b1 & 0xFC) >> 2];
-        output[output_len++] = b64_char[(b1 & 0x03) << 4 | (b2 & 0xF0) >> 4];
-        output[output_len++] = b64_char[(b2 & 0x0F) << 2];
-        output[output_len++] = '=';
-    } else if (remaining == 1) {
-        uint8_t b1 = bytes[bytes_i++];
-        output[output_len++] = b64_char[(b1 & 0xFC) >> 2];
-        output[output_len++] = b64_char[(b1 & 0x03) << 4];
-        output[output_len++] = '=';
-        output[output_len++] = '=';
-    }
-    assert(bytes_i == bytes_len);
-    assert((output_len) % 4 == 0);
-    ret = output_len;
+    ret = encode_b64(bytes, bytes_len, output);
 
 error:
-    output[output_len] = '\0';
     free(bytes);
     return ret;
 }

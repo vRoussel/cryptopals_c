@@ -53,7 +53,6 @@ void test_hex_to_base64()
     int ret;
     ret = hex_to_base64("AAG", tmp);
     TEST_ASSERT_EQUAL_INT(ret, -1);
-    TEST_ASSERT_EQUAL_STRING(tmp, "");
 
     ret = hex_to_base64("", tmp);
     TEST_ASSERT_EQUAL_INT(ret, 0);
