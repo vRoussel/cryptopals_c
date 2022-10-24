@@ -88,6 +88,18 @@ void test_xor()
 }
 
 
+void test_decipher_single_byte_xor()
+{
+    char *ciphered = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
+    char tmp[512];
+    ssize_t ret;
+
+    ret = decipher_single_byte_xor(ciphered, tmp);
+    TEST_ASSERT_EQUAL_INT(ret, 34);
+    TEST_ASSERT_EQUAL_STRING(tmp, "Cooking MC's like a pound of bacon");
+}
+
+
 int main()
 {
     UNITY_BEGIN();
@@ -95,5 +107,6 @@ int main()
     RUN_TEST(test_byte_to_hex_char);
     RUN_TEST(test_hex_to_base64);
     RUN_TEST(test_xor);
+    RUN_TEST(test_decipher_single_byte_xor);
     return UNITY_END();
 }
