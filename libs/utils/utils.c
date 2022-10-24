@@ -6,8 +6,8 @@
 #include <assert.h>
 #include <math.h>
 
-#define max(a,b) ((a) > (b) ? (a) : (b))
-#define min(a,b) ((a) < (b) ? (a) : (b))
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
 
 //TODO add tests
 
@@ -162,7 +162,7 @@ ssize_t xor_hex(char *left, char *right, char *output)
 
     size_t left_bytes_len = left_ret;
     size_t right_bytes_len = right_ret;
-    uint8_t xor_bytes[max(left_bytes_len, right_bytes_len)];
+    uint8_t xor_bytes[MAX(left_bytes_len, right_bytes_len)];
     ssize_t xor_ret = xor(left_bytes, left_bytes_len, right_bytes, right_bytes_len, xor_bytes);
     if (xor_ret < 0)
         return -1;
