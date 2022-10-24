@@ -1,5 +1,3 @@
-add_library(utils
-    utils.c
-)
+add_library(utils INTERFACE)
 
 add_subdirectory(test)
