@@ -33,7 +33,7 @@ char byte_to_hex_char(uint8_t b)
         return 'A' + b - 10;
 }
 
-ssize_t decode_hex(char *input, uint8_t *output)
+ssize_t decode_hex(const char *input, uint8_t *output)
 {
     int ret = 0;
     size_t input_len = strlen(input);
@@ -67,7 +67,7 @@ error:
     return ret;
 }
 
-ssize_t encode_hex(uint8_t *input, size_t input_len, char *output)
+ssize_t encode_hex(const uint8_t *input, size_t input_len, char *output)
 {
     size_t output_len = 0;
     for (size_t i = 0; i < input_len; i++) {
@@ -85,7 +85,7 @@ ssize_t encode_hex(uint8_t *input, size_t input_len, char *output)
     return output_len;
 }
 
-ssize_t encode_b64(uint8_t *input, uint8_t input_len, char *output)
+ssize_t encode_b64(const uint8_t *input, uint8_t input_len, char *output)
 {
     size_t output_len = 0;
     size_t input_i = 0;
@@ -121,7 +121,7 @@ ssize_t encode_b64(uint8_t *input, uint8_t input_len, char *output)
     return output_len;
 }
 
-ssize_t hex_to_base64(char *input, char *output)
+ssize_t hex_to_base64(const char *input, char *output)
 {
     int ret = 0;
     size_t input_len = strlen(input);

@@ -1,1 +1,1 @@
-unsigned int english_score(char *input);
+unsigned int english_score(const char *input);

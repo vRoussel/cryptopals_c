@@ -7,7 +7,7 @@
 #include "encoding/encoding.h"
 #include "utils/utils.h"
 
-ssize_t xor(uint8_t *left, size_t left_len, uint8_t *right, size_t right_len, uint8_t *output)
+ssize_t xor(const uint8_t *left, size_t left_len, const uint8_t *right, size_t right_len, uint8_t *output)
 {
     size_t left_i = 0;
     size_t right_i = 0;
@@ -34,7 +34,7 @@ ssize_t xor(uint8_t *left, size_t left_len, uint8_t *right, size_t right_len, ui
     return output_len;
 }
 
-ssize_t xor_hex(char *left, char *right, char *output)
+ssize_t xor_hex(const char *left, const char *right, char *output)
 {
     size_t left_len = strlen(left);
     size_t right_len = strlen(right);
@@ -60,7 +60,7 @@ ssize_t xor_hex(char *left, char *right, char *output)
     return encode_hex(xor_bytes, xor_bytes_len, output);
 }
 
-ssize_t xor_repeated_key(uint8_t *input, size_t input_len, uint8_t *key, size_t key_len, uint8_t *output)
+ssize_t xor_repeated_key(const uint8_t *input, size_t input_len, const uint8_t *key, size_t key_len, uint8_t *output)
 {
     size_t input_i = 0;
     size_t key_i = 0;
@@ -73,7 +73,7 @@ ssize_t xor_repeated_key(uint8_t *input, size_t input_len, uint8_t *key, size_t 
     return output_len;
 }
 
-ssize_t decipher_single_byte_xor(char *input_hex, char *output, uint8_t *output_key)
+ssize_t decipher_single_byte_xor(const char *input_hex, char *output, uint8_t *output_key)
 {
     size_t len = strlen(input_hex);
     size_t max_bytes = (len + 1) / 2; //+1 in case len is odd

@@ -32,7 +32,7 @@ double english_letters_freq[] = {
     0.2722,  //z
 };
 
-unsigned int english_score(char *input)
+unsigned int english_score(const char *input)
 {
     unsigned int letters_count[26] = {0};
     unsigned int total_count = 0;
