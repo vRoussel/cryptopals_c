@@ -74,7 +74,7 @@ ssize_t xor_repeated_key(const uint8_t *input, size_t input_len, const uint8_t *
     return output_len;
 }
 
-ssize_t decipher_single_byte_xor(const char *input_hex, char *output, uint8_t *output_key, unsigned int *output_score)
+ssize_t decipher_xor_single_byte_key(const char *input_hex, char *output, uint8_t *output_key, unsigned int *output_score)
 {
     size_t len = strlen(input_hex);
     size_t max_bytes = (len + 1) / 2; //+1 in case len is odd

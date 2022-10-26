@@ -39,7 +39,7 @@ void test_xor()
 //    TEST_ASSERT_EQUAL_STRING(tmp, "ABBBCD");
 //}
 
-void test_decipher_single_byte_xor()
+void test_decipher_xor_single_byte_key()
 {
     char *ciphered = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
     char tmp[512];
@@ -47,7 +47,7 @@ void test_decipher_single_byte_xor()
     uint8_t key;
     unsigned int score;
 
-    ret = decipher_single_byte_xor(ciphered, tmp, &key, &score);
+    ret = decipher_xor_single_byte_key(ciphered, tmp, &key, &score);
     TEST_ASSERT_EQUAL_INT(ret, 34);
     TEST_ASSERT_EQUAL_INT(key, 88);
     TEST_ASSERT_EQUAL_STRING(tmp, "Cooking MC's like a pound of bacon");
@@ -58,6 +58,6 @@ int main()
 {
     UNITY_BEGIN();
     RUN_TEST(test_xor);
-    RUN_TEST(test_decipher_single_byte_xor);
+    RUN_TEST(test_decipher_xor_single_byte_key);
     return UNITY_END();
 }
