@@ -45,8 +45,9 @@ void test_decipher_single_byte_xor()
     char tmp[512];
     ssize_t ret;
     uint8_t key;
+    unsigned int score;
 
-    ret = decipher_single_byte_xor(ciphered, tmp, &key);
+    ret = decipher_single_byte_xor(ciphered, tmp, &key, &score);
     TEST_ASSERT_EQUAL_INT(ret, 34);
     TEST_ASSERT_EQUAL_INT(key, 88);
     TEST_ASSERT_EQUAL_STRING(tmp, "Cooking MC's like a pound of bacon");

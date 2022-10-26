@@ -1,5 +1,6 @@
 #include "crypto.h"
 
+#include <limits.h>
 #include <string.h>
 #include <assert.h>
 
@@ -73,7 +74,7 @@ ssize_t xor_repeated_key(const uint8_t *input, size_t input_len, const uint8_t *
     return output_len;
 }
 
-ssize_t decipher_single_byte_xor(const char *input_hex, char *output, uint8_t *output_key)
+ssize_t decipher_single_byte_xor(const char *input_hex, char *output, uint8_t *output_key, unsigned int *output_score)
 {
     size_t len = strlen(input_hex);
     size_t max_bytes = (len + 1) / 2; //+1 in case len is odd
@@ -89,17 +90,17 @@ ssize_t decipher_single_byte_xor(const char *input_hex, char *output, uint8_t *o
     char buf2[len];
     char *storage = buf1;
     char *best_match = buf2;
-    unsigned int best_score = 100;
+    *output_score = UINT_MAX;
     ssize_t ret = -1;
     for (uint16_t i = 0; i <= UINT8_MAX; i++) {
         uint8_t key = i;
         ssize_t xor_ret = xor_repeated_key(bytes, bytes_len, &key, 1, (uint8_t*)storage);
         if (xor_ret >= 0) {
             unsigned int score = english_score(storage);
-            if (score < best_score) {
-                best_score = score;
-                ret = xor_ret;
+            if (score < *output_score) {
+                *output_score = score;
                 *output_key = key;
+                ret = xor_ret;
                 SWAP(best_match, storage, char*);
             }
         }
