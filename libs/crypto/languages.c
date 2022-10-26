@@ -3,7 +3,7 @@
 #include "ctype.h"
 #include "math.h"
 
-double english_letters_freq[] = {
+const double english_letters_freq[] = {
     8.4966,  //a
     2.0720,  //b
     4.5388,  //c
@@ -32,14 +32,22 @@ double english_letters_freq[] = {
     0.2722,  //z
 };
 
+const double english_space_freq = 20.0;
+
 unsigned int english_score(const char *input)
 {
     unsigned int letters_count[26] = {0};
     unsigned int total_count = 0;
+    unsigned int non_printable_count = 0;
+    unsigned int space_count = 0;
     while (*input != '\0') {
         char c = tolower(*input);
         if (c >= 'a' && c <= 'z') {
             letters_count[c - 'a']++;
+        } else if (c == ' ') {
+            space_count++;
+        } else if (!isprint(c)) {
+            non_printable_count++;
         }
         total_count++;
         input++;
@@ -54,5 +62,8 @@ unsigned int english_score(const char *input)
         double english_freq = english_letters_freq[i];
         score += fabs(english_freq - input_freq);
     }
+    double space_freq = space_count / (double)total_count * 100;
+    score += fabs(space_freq - english_space_freq);
+    score += (non_printable_count / (double)total_count * 100);
     return (unsigned int)score;
 }
