@@ -24,10 +24,8 @@ int main(int argc, char *argv[])
 {
     parse_args(argc, argv);
 
-    char line[BUF_SIZE];
-    char buf[BUF_SIZE / 2];
-
-    deciphered_s candidate = {line, buf, UINT_MAX, 0};
+    deciphered_s candidate;
+    deciphered_init(&candidate, BUF_SIZE);
     while (get_next_line(candidate.input, BUF_SIZE) == 0) {
         if (decipher_xor_single_byte_key(candidate.input, candidate.output, &candidate.key, &candidate.score) < 0) {
             printf("Error while trying to decipher line %d\n", line_num);
@@ -38,6 +36,7 @@ int main(int argc, char *argv[])
             deciphered_print(&candidate);
         }
     }
+    deciphered_finalize(&candidate);
 }
 
 void skip_until_eol()

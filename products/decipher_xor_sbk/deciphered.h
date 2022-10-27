@@ -1,7 +1,8 @@
 #pragma once
 
+#include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
+
 
 typedef struct {
     char *input;
@@ -11,7 +12,6 @@ typedef struct {
 } deciphered_s;
 
 
-void deciphered_print(const deciphered_s *d)
-{
-        printf("%s [key=%hhu] [score=%u] -> %s\n", d->input, d->key, d->score, d->output);
-}
+void deciphered_init(deciphered_s *d, size_t buf_size);
+void deciphered_finalize(deciphered_s *d);
+void deciphered_print(const deciphered_s *d);
