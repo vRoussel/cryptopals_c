@@ -13,20 +13,18 @@
 #define ENGLISH_SCORE_LIMIT 80
 
 void print_usage();
-void skip_until_eol();
 void parse_args(int argc, char *argv[]);
-int get_next_line(char *out, size_t limit);
 
-static unsigned int line_num = 0;
 static int verbose = 0;
 
 int main(int argc, char *argv[])
 {
     parse_args(argc, argv);
 
+    unsigned int line_num = 0;
     deciphered_s candidate;
     deciphered_init(&candidate, BUF_SIZE);
-    while (get_next_line(candidate.input, BUF_SIZE) == 0) {
+    while (get_next_line(candidate.input, BUF_SIZE, &line_num) == 0) {
         if (decipher_xor_single_byte_key(candidate.input, candidate.output, &candidate.key, &candidate.score) < 0) {
             printf("Error while trying to decipher line %d\n", line_num);
             continue;
@@ -37,11 +35,6 @@ int main(int argc, char *argv[])
         }
     }
     deciphered_finalize(&candidate);
-}
-
-void skip_until_eol()
-{
-    for (int c = getchar(); c != '\n' && c != EOF; c = getchar());
 }
 
 void print_usage()
@@ -74,22 +67,4 @@ void parse_args(int argc, char *argv[])
             exit(1);
         }
     }
-}
-
-int get_next_line(char *out, size_t limit)
-{
-    bool found = false;
-    while (!found && fgets(out, limit, stdin) != NULL) {
-        line_num++;
-        size_t len = strlen(out);
-        assert(len > 0);
-        if (out[len - 1] != '\n') {
-            printf("Skipping line %d because it is too long or incomplete (\\n missing?)\n", line_num);
-            skip_until_eol();
-            continue;
-        }
-        out[--len] = '\0';
-        found = true;
-    }
-    return found ? 0 : EOF;
 }

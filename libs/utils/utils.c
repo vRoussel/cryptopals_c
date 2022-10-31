@@ -3,6 +3,9 @@
 #include <stdint.h>
 #include <string.h>
 #include <limits.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <assert.h>
 
 #include "crypto/crypto.h"
 
@@ -30,4 +33,28 @@ unsigned int hamming_distance_str(const char* s1, const char* s2)
     }
 
     return diff_count;
+}
+
+int get_next_line(char *out, size_t limit, unsigned int *line_num)
+{
+    bool found = false;
+    while (!found && fgets(out, limit, stdin) != NULL) {
+        if (line_num)
+            (*line_num)++;
+        size_t len = strlen(out);
+        assert(len > 0);
+        if (out[len - 1] != '\n') {
+            printf("Skipping line %d because it is too long or incomplete (\\n missing?)\n", line_num ? *line_num : 0);
+            skip_until_eol();
+            continue;
+        }
+        out[--len] = '\0';
+        found = true;
+    }
+    return found ? 0 : EOF;
+}
+
+void skip_until_eol()
+{
+    for (int c = getchar(); c != '\n' && c != EOF; c = getchar());
 }
