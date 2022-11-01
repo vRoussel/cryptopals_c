@@ -12,6 +12,13 @@ const char b64_char[64] = {
     '+','/'
 };
 
+char byte_to_b64_char(uint8_t b)
+{
+    if (b > 63)
+        return -1;
+    return b64_char[b];
+}
+
 int8_t hex_char_to_byte(char c)
 {
     char c_up = toupper(c);
@@ -93,10 +100,10 @@ ssize_t encode_b64(const uint8_t *input, uint8_t input_len, char *output)
         uint8_t b1 = input[input_i++];
         uint8_t b2 = input[input_i++];
         uint8_t b3 = input[input_i++];
-        output[output_len++] = b64_char[(b1 & 0xFC) >> 2];
-        output[output_len++] = b64_char[(b1 & 0x03) << 4 | (b2 & 0xF0) >> 4];
-        output[output_len++] = b64_char[(b2 & 0x0F) << 2 | (b3 & 0xC0) >> 6];
-        output[output_len++] = b64_char[b3 & 0x3F];
+        output[output_len++] = byte_to_b64_char((b1 & 0xFC) >> 2);
+        output[output_len++] = byte_to_b64_char((b1 & 0x03) << 4 | (b2 & 0xF0) >> 4);
+        output[output_len++] = byte_to_b64_char((b2 & 0x0F) << 2 | (b3 & 0xC0) >> 6);
+        output[output_len++] = byte_to_b64_char(b3 & 0x3F);
     }
 
     size_t remaining = input_len - input_i;
@@ -104,14 +111,14 @@ ssize_t encode_b64(const uint8_t *input, uint8_t input_len, char *output)
     if (remaining == 2) {
         uint8_t b1 = input[input_i++];
         uint8_t b2 = input[input_i++];
-        output[output_len++] = b64_char[(b1 & 0xFC) >> 2];
-        output[output_len++] = b64_char[(b1 & 0x03) << 4 | (b2 & 0xF0) >> 4];
-        output[output_len++] = b64_char[(b2 & 0x0F) << 2];
+        output[output_len++] = byte_to_b64_char((b1 & 0xFC) >> 2);
+        output[output_len++] = byte_to_b64_char((b1 & 0x03) << 4 | (b2 & 0xF0) >> 4);
+        output[output_len++] = byte_to_b64_char((b2 & 0x0F) << 2);
         output[output_len++] = '=';
     } else if (remaining == 1) {
         uint8_t b1 = input[input_i++];
-        output[output_len++] = b64_char[(b1 & 0xFC) >> 2];
-        output[output_len++] = b64_char[(b1 & 0x03) << 4];
+        output[output_len++] = byte_to_b64_char((b1 & 0xFC) >> 2);
+        output[output_len++] = byte_to_b64_char((b1 & 0x03) << 4);
         output[output_len++] = '=';
         output[output_len++] = '=';
     }
