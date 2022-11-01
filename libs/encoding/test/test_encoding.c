@@ -63,6 +63,33 @@ void test_hex_to_base64()
     TEST_ASSERT_EQUAL_STRING(tmp, "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t");
 }
 
+void test_decode_encode_b64()
+{
+    uint8_t expected_bytes[] = {0x96, 0x8a, 0xf7, 0x98, 0x8a, 0x6c, 0x52, 0x6d, 0x76, 0xdf, 0xdf, 0x3b, 0xfb};
+    char input[] = "lor3mIpsUm123987+w==";
+
+    uint8_t tmp_bytes[512];
+    char tmp_str[512];
+    int ret;
+
+    ret = decode_b64(input, tmp_bytes);
+    TEST_ASSERT_EQUAL_INT(ret, 13);
+    TEST_ASSERT_EQUAL_HEX8_ARRAY(expected_bytes, tmp_bytes, 13);
+
+    ret = encode_b64(tmp_bytes, 13, tmp_str);
+    TEST_ASSERT_EQUAL_INT(ret, 20);
+    TEST_ASSERT_EQUAL_STRING(tmp_str, input);
+
+    ret = decode_b64("", tmp_bytes);
+    TEST_ASSERT_EQUAL_INT(ret, 0);
+
+    ret = decode_b64("abc!", tmp_bytes);
+    TEST_ASSERT_EQUAL_INT(ret, -1);
+
+    ret = decode_b64("abcde===", tmp_bytes);
+    TEST_ASSERT_EQUAL_INT(ret, -1);
+}
+
 
 int main()
 {
@@ -70,5 +97,6 @@ int main()
     RUN_TEST(test_hex_char_to_byte);
     RUN_TEST(test_byte_to_hex_char);
     RUN_TEST(test_hex_to_base64);
+    RUN_TEST(test_decode_encode_b64);
     return UNITY_END();
 }

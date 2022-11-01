@@ -19,6 +19,27 @@ char byte_to_b64_char(uint8_t b)
     return b64_char[b];
 }
 
+int8_t b64_char_to_byte(char c)
+{
+    // [0,25]
+    if (c >= 'A' && c <= 'Z')
+        return c - 'A';
+    // [26,51]
+    else if (c >= 'a' && c <= 'z')
+        return c - 'a' + 26;
+    // [52,61]
+    else if (isdigit(c))
+        return c - '0' + 52;
+    // 62
+    else if (c == '+')
+        return 62;
+    // 63
+    else if (c == '/')
+        return 63;
+    else
+        return -1;
+}
+
 int8_t hex_char_to_byte(char c)
 {
     char c_up = toupper(c);
@@ -90,6 +111,68 @@ ssize_t encode_hex(const uint8_t *input, size_t input_len, char *output)
     }
     output[output_len] = '\0';
     return output_len;
+}
+
+ssize_t decode_b64(const char *input, uint8_t *output)
+{
+    size_t input_len = strlen(input);
+    if(input_len == 0)
+        return 0;
+
+    int ret = 0;
+    size_t output_len = 0;
+
+    if (input_len % 4 != 0)
+        return -1;
+
+    while (input_len > 4) {
+        int8_t b1 = b64_char_to_byte(*input++);
+        int8_t b2 = b64_char_to_byte(*input++);
+        int8_t b3 = b64_char_to_byte(*input++);
+        int8_t b4 = b64_char_to_byte(*input++);
+
+        if (b1 < 0 || b2 < 0 || b3 < 0 || b4 < 0) {
+            ret = -1;
+            goto error;
+        }
+        output[output_len++] = (uint8_t)b1 << 2 | (uint8_t)b2 >> 4;
+        output[output_len++] = ((uint8_t)b2 & 0x0F) << 4 | ((uint8_t)b3 & 0x3C) >> 2;
+        output[output_len++] = ((uint8_t)b3 & 0x03) << 6 | (uint8_t)b4;
+        input_len -= 4;
+    }
+
+    assert(input_len == 4);
+
+    //We need to handle last 4 chars differently
+    //because last 2 could be padding
+    int8_t b1 = b64_char_to_byte(*input++);
+    int8_t b2 = b64_char_to_byte(*input++);
+    if (b1 < 0 || b2 < 0) {
+        ret = -1;
+        goto error;
+    }
+    output[output_len++] = (uint8_t)b1 << 2 | (uint8_t)b2 >> 4;
+    if (*input != '=') {
+        int8_t b3 = b64_char_to_byte(*input++);
+        if (b3 < 0) {
+            ret = -1;
+            goto error;
+        }
+        output[output_len++] = ((uint8_t)b2 & 0x0F) << 4 | ((uint8_t)b3 & 0x3C) >> 2;
+        if (*input != '=') {
+            int8_t b4 = b64_char_to_byte(*input++);
+            if (b4 < 0) {
+                ret = -1;
+                goto error;
+            }
+            output[output_len++] = ((uint8_t)b3 & 0x03) << 6 | (uint8_t)b4;
+        }
+    }
+
+    ret = output_len;
+
+error:
+    return ret;
 }
 
 ssize_t encode_b64(const uint8_t *input, uint8_t input_len, char *output)
