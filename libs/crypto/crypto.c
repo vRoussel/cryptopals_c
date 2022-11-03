@@ -86,7 +86,44 @@ ssize_t xor_repeated_key_str_to_hex(const char* input, const char *key, char* ou
     return encode_hex(bytes, bytes_len, output);
 }
 
-ssize_t decipher_xor_single_byte_key(const char *input_hex, char *output, uint8_t *output_key, unsigned int *output_score)
+ssize_t decipher_xor_single_byte_key(const uint8_t *input, size_t input_len, char *output, uint8_t *output_key, unsigned int *output_score)
+{
+    char buf1[input_len];
+    char buf2[input_len];
+    char *storage = buf1;
+    char *best_match = buf2;
+    unsigned int best_score = UINT_MAX;
+    char best_key;
+    ssize_t ret = -1;
+    for (uint16_t i = 0; i <= UINT8_MAX; i++) {
+        uint8_t key = i;
+        ssize_t xor_ret = xor_repeated_key(input, input_len, &key, 1, (uint8_t*)storage);
+        if (xor_ret >= 0) {
+            unsigned int score = english_score(storage);
+            if (score < best_score) {
+                best_score = score;
+                best_key = key;
+                ret = xor_ret;
+                SWAP(best_match, storage, char*);
+            }
+        }
+    }
+    if (ret >= 0) {
+        if (output) {
+            memcpy(output, best_match, ret);
+            output[ret] = '\0';
+        }
+        if (output_score) {
+            *output_score = best_score;
+        }
+        if (output_key) {
+            *output_key = best_key;
+        }
+    }
+    return ret;
+}
+
+ssize_t decipher_xor_single_byte_key_hex(const char *input_hex, char *output, uint8_t *output_key, unsigned int *output_score)
 {
     size_t len = strlen(input_hex);
     size_t max_bytes = (len + 1) / 2; //+1 in case len is odd
@@ -97,29 +134,5 @@ ssize_t decipher_xor_single_byte_key(const char *input_hex, char *output, uint8_
         return -1;
 
     size_t bytes_len = bytes_ret;
-
-    char buf1[len];
-    char buf2[len];
-    char *storage = buf1;
-    char *best_match = buf2;
-    *output_score = UINT_MAX;
-    ssize_t ret = -1;
-    for (uint16_t i = 0; i <= UINT8_MAX; i++) {
-        uint8_t key = i;
-        ssize_t xor_ret = xor_repeated_key(bytes, bytes_len, &key, 1, (uint8_t*)storage);
-        if (xor_ret >= 0) {
-            unsigned int score = english_score(storage);
-            if (score < *output_score) {
-                *output_score = score;
-                *output_key = key;
-                ret = xor_ret;
-                SWAP(best_match, storage, char*);
-            }
-        }
-    }
-    if (ret >= 0) {
-        memcpy(output, best_match, ret);
-        output[ret] = '\0';
-    }
-    return ret;
+    return decipher_xor_single_byte_key(bytes, bytes_len, output, output_key, output_score);
 }

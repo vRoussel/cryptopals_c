@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     deciphered_s candidate;
     deciphered_init(&candidate, BUF_SIZE);
     while (get_next_line(candidate.input, BUF_SIZE, &line_num) == 0) {
-        if (decipher_xor_single_byte_key(candidate.input, candidate.output, &candidate.key, &candidate.score) < 0) {
+        if (decipher_xor_single_byte_key_hex(candidate.input, candidate.output, &candidate.key, &candidate.score) < 0) {
             printf("Error while trying to decipher line %d\n", line_num);
             continue;
         }

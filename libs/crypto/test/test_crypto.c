@@ -59,7 +59,7 @@ void test_decipher_xor_single_byte_key()
     uint8_t key;
     unsigned int score;
 
-    ret = decipher_xor_single_byte_key(ciphered, tmp, &key, &score);
+    ret = decipher_xor_single_byte_key_hex(ciphered, tmp, &key, &score);
     TEST_ASSERT_EQUAL_INT(ret, 34);
     TEST_ASSERT_EQUAL_INT(key, 88);
     TEST_ASSERT_EQUAL_STRING(tmp, "Cooking MC's like a pound of bacon");
