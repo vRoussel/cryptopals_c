@@ -1,2 +1,3 @@
 add_subdirectory(bakasable)
 add_subdirectory(decipher_xor_sbk)
+add_subdirectory(decipher_xor_rk)
