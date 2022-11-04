@@ -1,5 +1,3 @@
-#include "deciphered.h"
-
 #include "crypto/crypto.h"
 #include "encoding/encoding.h"
 #include "utils/utils.h"
@@ -11,8 +9,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define BUF_SIZE 4096
 #define ENGLISH_SCORE_LIMIT 80
+#define BUF_SIZE 4096
+
+#include "deciphered.h"
+
 
 void print_usage();
 void parse_args(int argc, char *argv[]);
@@ -27,7 +28,7 @@ int main(int argc, char *argv[])
 
     unsigned int line_num = 0;
     deciphered_s candidate;
-    deciphered_init(&candidate, BUF_SIZE);
+    deciphered_init(&candidate);
     while (get_next_line(candidate.input, BUF_SIZE, &line_num) == 0) {
         uint8_t bytes[BUF_SIZE];
         ssize_t decode_ret = decode_hex(candidate.input, bytes);
