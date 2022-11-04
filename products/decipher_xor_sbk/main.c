@@ -1,6 +1,8 @@
-#include "crypto/crypto.h"
-#include "utils/utils.h"
 #include "deciphered.h"
+
+#include "crypto/crypto.h"
+#include "encoding/encoding.h"
+#include "utils/utils.h"
 
 #include <assert.h>
 #include <limits.h>
@@ -17,6 +19,8 @@ void parse_args(int argc, char *argv[]);
 
 static int verbose = 0;
 
+//TODO add --base64 and --hex flags
+
 int main(int argc, char *argv[])
 {
     parse_args(argc, argv);
@@ -25,7 +29,15 @@ int main(int argc, char *argv[])
     deciphered_s candidate;
     deciphered_init(&candidate, BUF_SIZE);
     while (get_next_line(candidate.input, BUF_SIZE, &line_num) == 0) {
-        if (decipher_xor_single_byte_key_hex(candidate.input, candidate.output, &candidate.key, &candidate.score) < 0) {
+        uint8_t bytes[BUF_SIZE];
+        ssize_t decode_ret = decode_hex(candidate.input, bytes);
+        if (decode_ret < 1) {
+            printf("Unable to decode input on line %d\n", line_num);
+            continue;
+        }
+        size_t bytes_len = decode_ret;
+
+        if (decipher_xor_single_byte_key(bytes, bytes_len, candidate.output, &candidate.key, &candidate.score) < 0) {
             printf("Error while trying to decipher line %d\n", line_num);
             continue;
         }

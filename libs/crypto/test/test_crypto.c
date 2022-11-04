@@ -69,16 +69,24 @@ void test_xor_repeated_key_str_to_hex()
 
 void test_decipher_xor_single_byte_key()
 {
-    char *ciphered = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
+    uint8_t ciphered[] = {
+        0x1b, 0x37, 0x37, 0x33, 0x31, 0x36, 0x3f, 0x78,
+        0x15, 0x1b, 0x7f, 0x2b, 0x78, 0x34, 0x31, 0x33,
+        0x3d, 0x78, 0x39, 0x78, 0x28, 0x37, 0x2d, 0x36,
+        0x3c, 0x78, 0x37, 0x3e, 0x78, 0x3a, 0x39, 0x3b,
+        0x37, 0x36};
+    char *expected = "Cooking MC's like a pound of bacon";
+    uint8_t expected_key = 'X';
     char tmp[512];
+
     ssize_t ret;
     uint8_t key;
     unsigned int score;
 
-    ret = decipher_xor_single_byte_key_hex(ciphered, tmp, &key, &score);
-    TEST_ASSERT_EQUAL_INT(ret, 34);
-    TEST_ASSERT_EQUAL_INT(key, 88);
-    TEST_ASSERT_EQUAL_STRING(tmp, "Cooking MC's like a pound of bacon");
+    ret = decipher_xor_single_byte_key(ciphered, ARRAY_SIZE(ciphered), tmp, &key, &score);
+    TEST_ASSERT_EQUAL_INT(ret, strlen(expected));
+    TEST_ASSERT_EQUAL_INT(key, expected_key);
+    TEST_ASSERT_EQUAL_STRING(tmp, expected);
 }
 
 

@@ -84,17 +84,3 @@ ssize_t decipher_xor_single_byte_key(const uint8_t *input, size_t input_len, cha
     }
     return ret;
 }
-
-ssize_t decipher_xor_single_byte_key_hex(const char *input_hex, char *output, uint8_t *output_key, unsigned int *output_score)
-{
-    size_t len = strlen(input_hex);
-    size_t max_bytes = (len + 1) / 2; //+1 in case len is odd
-
-    uint8_t bytes[max_bytes];
-    ssize_t bytes_ret = decode_hex(input_hex, bytes);
-    if (bytes_ret < 1)
-        return -1;
-
-    size_t bytes_len = bytes_ret;
-    return decipher_xor_single_byte_key(bytes, bytes_len, output, output_key, output_score);
-}
