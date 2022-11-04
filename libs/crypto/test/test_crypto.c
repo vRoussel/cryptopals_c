@@ -1,6 +1,8 @@
 #include "unity.h"
 #include "crypto/crypto.h"
 
+#include <string.h>
+
 #define ARRAY_SIZE(X) (sizeof(X) / sizeof(X[0]))
 
 void setUp() {}
@@ -44,12 +46,25 @@ void test_xor_repeated_key_str_to_hex()
 {
     char *input = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
     char *key = "ICE";
-    char tmp[512];
+    uint8_t expected[] = {
+        0x0B, 0x36, 0x37, 0x27, 0x2A, 0x2B, 0x2E, 0x63,
+        0x62, 0x2C, 0x2E, 0x69, 0x69, 0x2A, 0x23, 0x69,
+        0x3A, 0x2A, 0x3C, 0x63, 0x24, 0x20, 0x2D, 0x62,
+        0x3D, 0x63, 0x34, 0x3C, 0x2A, 0x26, 0x22, 0x63,
+        0x24, 0x27, 0x27, 0x65, 0x27, 0x2A, 0x28, 0x2B,
+        0x2F, 0x20, 0x43, 0x0A, 0x65, 0x2E, 0x2C, 0x65,
+        0x2A, 0x31, 0x24, 0x33, 0x3A, 0x65, 0x3E, 0x2B,
+        0x20, 0x27, 0x63, 0x0C, 0x69, 0x2B, 0x20, 0x28,
+        0x31, 0x65, 0x28, 0x63, 0x26, 0x30, 0x2E, 0x27,
+        0x28, 0x2F
+    };
+
+    uint8_t tmp[512];
     ssize_t ret;
 
-    ret = xor_repeated_key_str_to_hex(input, key, tmp);
-    TEST_ASSERT_EQUAL_INT(ret, 148);
-    TEST_ASSERT_EQUAL_STRING(tmp, "0B3637272A2B2E63622C2E69692A23693A2A3C6324202D623D63343C2A26226324272765272A282B2F20430A652E2C652A3124333A653E2B2027630C692B20283165286326302E27282F");
+    ret = xor_repeated_key((uint8_t*)input, strlen(input), (uint8_t*)key, strlen(key), tmp);
+    TEST_ASSERT_EQUAL_INT(ret, ARRAY_SIZE(expected));
+    TEST_ASSERT_EQUAL_HEX8_ARRAY(tmp, expected, ARRAY_SIZE(expected));
 }
 
 void test_decipher_xor_single_byte_key()

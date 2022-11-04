@@ -48,18 +48,6 @@ ssize_t xor_repeated_key(const uint8_t *input, size_t input_len, const uint8_t *
     return output_len;
 }
 
-ssize_t xor_repeated_key_str_to_hex(const char* input, const char *key, char* output)
-{
-    size_t input_len = strlen(input);
-    uint8_t bytes[input_len];
-    ssize_t xor_ret = xor_repeated_key((uint8_t*)input, strlen(input), (uint8_t*)key, strlen(key), bytes);
-    if (xor_ret < 0) {
-        return -1;
-    }
-    size_t bytes_len = xor_ret;
-    return encode_hex(bytes, bytes_len, output);
-}
-
 ssize_t decipher_xor_single_byte_key(const uint8_t *input, size_t input_len, char *output, uint8_t *output_key, unsigned int *output_score)
 {
     char buf1[input_len];
