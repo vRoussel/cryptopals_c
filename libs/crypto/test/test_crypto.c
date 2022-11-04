@@ -19,14 +19,14 @@ void test_xor()
     ssize_t ret;
 
     ret = xor(input1, ARRAY_SIZE(input1), input2, ARRAY_SIZE(input2), tmp);
-    TEST_ASSERT_EQUAL_INT(ret, 18);
+    TEST_ASSERT_EQUAL_INT(ret, ARRAY_SIZE(expected12));
     TEST_ASSERT_EQUAL_HEX8_ARRAY(tmp, expected12, ARRAY_SIZE(expected12));
 
     uint8_t input3[] = {0x00, 0x11, 0x01};
     uint8_t input4[] = {0xAB, 0xAA, 0xCC};
     uint8_t expected34[] = {0xAB, 0xBB, 0xCD};
     ret = xor(input3, ARRAY_SIZE(input3), input4, ARRAY_SIZE(input4), tmp);
-    TEST_ASSERT_EQUAL_INT(ret, 3);
+    TEST_ASSERT_EQUAL_INT(ret, ARRAY_SIZE(expected34));
     TEST_ASSERT_EQUAL_HEX8_ARRAY(tmp, expected34, ARRAY_SIZE(expected34));
 }
 
