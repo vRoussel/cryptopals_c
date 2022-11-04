@@ -35,32 +35,6 @@ ssize_t xor(const uint8_t *left, size_t left_len, const uint8_t *right, size_t r
     return output_len;
 }
 
-ssize_t xor_hex(const char *left, const char *right, char *output)
-{
-    size_t left_len = strlen(left);
-    size_t right_len = strlen(right);
-    size_t left_max_bytes = (left_len + 1) / 2; //+1 in case len is odd
-    size_t right_max_bytes = (right_len + 1) / 2; //+1 in case len is odd
-
-
-    uint8_t left_bytes[left_max_bytes];
-    uint8_t right_bytes[right_max_bytes];
-    ssize_t left_ret = decode_hex(left, left_bytes);
-    ssize_t right_ret = decode_hex(right, right_bytes);
-
-    if (left_ret < 0 || right_ret < 0)
-        return -1;
-
-    size_t left_bytes_len = left_ret;
-    size_t right_bytes_len = right_ret;
-    uint8_t xor_bytes[MAX(left_bytes_len, right_bytes_len)];
-    ssize_t xor_ret = xor(left_bytes, left_bytes_len, right_bytes, right_bytes_len, xor_bytes);
-    if (xor_ret < 0)
-        return -1;
-    size_t xor_bytes_len = xor_ret;
-    return encode_hex(xor_bytes, xor_bytes_len, output);
-}
-
 ssize_t xor_repeated_key(const uint8_t *input, size_t input_len, const uint8_t *key, size_t key_len, uint8_t *output)
 {
     size_t input_i = 0;

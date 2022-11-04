@@ -1,30 +1,31 @@
 #include "unity.h"
 #include "crypto/crypto.h"
 
+#define ARRAY_SIZE(X) (sizeof(X) / sizeof(X[0]))
+
 void setUp() {}
 void tearDown() {}
 
 void test_xor()
 {
-    char *hex1 = "1c0111001f010100061a024b53535009181c";
-    char *hex2 = "686974207468652062756c6c277320657965";
-    char tmp[512];
+    uint8_t input1[] = {0x1c, 0x01, 0x11, 0x00, 0x1f, 0x01, 0x01, 0x00, 0x06, 0x1a, 0x02, 0x4b, 0x53, 0x53, 0x50, 0x09, 0x18, 0x1c};
+    uint8_t input2[] = {0x68, 0x69, 0x74, 0x20, 0x74, 0x68, 0x65, 0x20, 0x62, 0x75, 0x6c, 0x6c, 0x27, 0x73, 0x20, 0x65, 0x79, 0x65};
+    uint8_t expected12[] = {0x74, 0x68, 0x65, 0x20, 0x6B, 0x69, 0x64, 0x20, 0x64, 0x6F, 0x6E, 0x27, 0x74, 0x20, 0x70, 0x6C, 0x61, 0x79};
+
+
+    uint8_t tmp[512];
     ssize_t ret;
 
-    ret = xor_hex(hex1, hex2, tmp);
-    TEST_ASSERT_EQUAL_INT(ret, 36);
-    TEST_ASSERT_EQUAL_STRING(tmp, "746865206B696420646F6E277420706C6179");
+    ret = xor(input1, ARRAY_SIZE(input1), input2, ARRAY_SIZE(input2), tmp);
+    TEST_ASSERT_EQUAL_INT(ret, 18);
+    TEST_ASSERT_EQUAL_HEX8_ARRAY(tmp, expected12, ARRAY_SIZE(expected12));
 
-    hex1 = "001101";
-    hex2 = "ABAACC";
-    ret = xor_hex(hex1, hex2, tmp);
-    TEST_ASSERT_EQUAL_INT(ret, 6);
-    TEST_ASSERT_EQUAL_STRING(tmp, "ABBBCD");
-
-    hex1 = "110G";
-    hex2 = "ABAA";
-    ret = xor_hex(hex1, hex2, tmp);
-    TEST_ASSERT_EQUAL_INT(ret, -1);
+    uint8_t input3[] = {0x00, 0x11, 0x01};
+    uint8_t input4[] = {0xAB, 0xAA, 0xCC};
+    uint8_t expected34[] = {0xAB, 0xBB, 0xCD};
+    ret = xor(input3, ARRAY_SIZE(input3), input4, ARRAY_SIZE(input4), tmp);
+    TEST_ASSERT_EQUAL_INT(ret, 3);
+    TEST_ASSERT_EQUAL_HEX8_ARRAY(tmp, expected34, ARRAY_SIZE(expected34));
 }
 
 //void test_xor_repeated_key()
