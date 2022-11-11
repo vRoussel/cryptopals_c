@@ -1,5 +1,6 @@
 #include "unity.h"
 #include "crypto/crypto.h"
+#include "encoding/encoding.h"
 
 #include <string.h>
 
@@ -89,6 +90,41 @@ void test_decipher_xor_single_byte_key()
     TEST_ASSERT_EQUAL_STRING(tmp, expected);
 }
 
+void test_decipher_aes_128_ecb()
+{
+    uint8_t *key = (uint8_t*)"YELLOW SUBMARINE";
+    char input[4096];
+    FILE *f = fopen("test_decipher_aes_128_ecb_input.txt", "r");
+    TEST_ASSERT_NOT_NULL(f);
+    char* fgets_ret = fgets(input, 4096, f);
+    TEST_ASSERT_NOT_NULL(fgets_ret);
+
+    size_t input_len = strlen(input);
+    TEST_ASSERT_EQUAL_CHAR(input[input_len-1], '\n');
+    input[--input_len] = '\0';
+
+
+    char expected[4096];
+    FILE *f2 = fopen("test_decipher_aes_128_ecb_output.txt", "r");
+    TEST_ASSERT_NOT_NULL(f2);
+    size_t bytes_read = fread(expected, sizeof(char), sizeof(expected), f2);
+    TEST_ASSERT_GREATER_OR_EQUAL_INT(0, bytes_read);
+    expected[bytes_read] = '\0';
+
+
+    uint8_t binary[4096];
+    ssize_t decode_ret = decode_b64(input, binary);
+    TEST_ASSERT_GREATER_OR_EQUAL_INT(0, decode_ret);
+    size_t binary_len = decode_ret;
+
+    uint8_t output[4096];
+    ssize_t decipher_ret = decipher_aes_128_ecb(binary, binary_len, key, output);
+    TEST_ASSERT_GREATER_OR_EQUAL_INT(0, decipher_ret);
+    TEST_ASSERT_EQUAL_STRING(output, expected);
+
+    fclose(f);
+    fclose(f2);
+}
 
 int main()
 {
@@ -96,5 +132,6 @@ int main()
     RUN_TEST(test_xor);
     RUN_TEST(test_decipher_xor_single_byte_key);
     RUN_TEST(test_xor_repeated_key_str_to_hex);
+    RUN_TEST(test_decipher_aes_128_ecb);
     return UNITY_END();
 }

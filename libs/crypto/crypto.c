@@ -3,6 +3,8 @@
 #include <limits.h>
 #include <string.h>
 #include <assert.h>
+#include <openssl/evp.h>
+#include <openssl/err.h>
 
 #include "languages.h"
 #include "encoding/encoding.h"
@@ -83,4 +85,34 @@ ssize_t decipher_xor_single_byte_key(const uint8_t *input, size_t input_len, cha
         }
     }
     return ret;
+}
+
+static void handleOpenSSLErrors(void)
+{
+    ERR_print_errors_fp(stderr);
+    abort();
+}
+
+ssize_t decipher_aes_128_ecb(const uint8_t *input, size_t input_len, const uint8_t *key, uint8_t *output)
+{
+    int len;
+    int output_len;
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+    if (!ctx)
+        handleOpenSSLErrors();
+
+    if (EVP_DecryptInit_ex(ctx, EVP_aes_128_ecb(), NULL, key, NULL) != 1)
+        handleOpenSSLErrors();
+
+    if (EVP_DecryptUpdate(ctx, output, &len, input, input_len) != 1)
+        handleOpenSSLErrors();
+    output_len = len;
+
+    if (EVP_DecryptFinal_ex(ctx, output + len, &len) != 1)
+        handleOpenSSLErrors();
+    output_len += len;
+
+    EVP_CIPHER_CTX_free(ctx);
+
+    return (ssize_t)output_len;
 }
