@@ -1,5 +1,6 @@
 #include "utils.h"
 
+#include <stdlib.h>
 #include <string.h>
 #include <limits.h>
 #include <stdbool.h>
@@ -62,4 +63,14 @@ int get_next_line(char *out, size_t limit, unsigned int *line_num)
 void skip_until_eol()
 {
     for (int c = getchar(); c != '\n' && c != EOF; c = getchar());
+}
+
+void *memdup(const void* in, size_t size)
+{
+    char *dup = malloc(size);
+
+    if (dup != NULL)
+        memcpy(dup, in, size);
+
+    return dup;
 }
