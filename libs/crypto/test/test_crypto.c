@@ -120,6 +120,8 @@ void test_decipher_aes_128_ecb()
     uint8_t output[4096];
     ssize_t decipher_ret = decipher_aes_128_ecb(binary, binary_len, key, output);
     TEST_ASSERT_GREATER_OR_EQUAL_INT(0, decipher_ret);
+    size_t output_len = decipher_ret;
+    output[output_len] = '\0';
     TEST_ASSERT_EQUAL_STRING(output, expected);
 
     fclose(f);
