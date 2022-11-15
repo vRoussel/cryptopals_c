@@ -1,5 +1,9 @@
 #include "unity.h"
 #include "utils/utils.h"
+#include "utils/hashmap.h"
+
+#include <stdbool.h>
+#include <string.h>
 
 void setUp() {}
 void tearDown() {}
@@ -33,10 +37,40 @@ void test_hamming_distance_str()
     TEST_ASSERT_EQUAL_UINT(hd, 37);
 }
 
+void test_hashmap()
+{
+    bool found;
+    char *tmp;
+    hashmap_s hm;
+    hashmap_init(&hm);
+
+    hashmap_set(&hm, "hello", "world", strlen("world") + 1);
+    tmp = hashmap_get(&hm, "hello", &found);
+    TEST_ASSERT_TRUE(found);
+    TEST_ASSERT_EQUAL_STRING(tmp, "world");
+
+    hashmap_set(&hm, "hello", "new world", strlen("new world") + 1);
+    tmp = hashmap_get(&hm, "hello", &found);
+    TEST_ASSERT_TRUE(found);
+    TEST_ASSERT_EQUAL_STRING(tmp, "new world");
+
+    hashmap_set(&hm, "just_a_key", NULL, 0);
+    tmp = hashmap_get(&hm, "just_a_key", &found);
+    TEST_ASSERT_TRUE(found);
+    TEST_ASSERT_EQUAL_STRING(tmp, NULL);
+
+    tmp = hashmap_get(&hm, "wrong_key", &found);
+    TEST_ASSERT_FALSE(found);
+    TEST_ASSERT_EQUAL_STRING(tmp, NULL);
+
+    hashmap_finalize(&hm);
+}
+
 int main()
 {
     UNITY_BEGIN();
     RUN_TEST(test_swap);
     RUN_TEST(test_hamming_distance_str);
+    RUN_TEST(test_hashmap);
     return UNITY_END();
 }
