@@ -9,6 +9,9 @@
 #include "languages.h"
 #include "encoding/encoding.h"
 #include "utils/utils.h"
+#include "utils/hashmap.h"
+
+#define ECB_ENCODING_DETECTION_DUPS_TRESHOLD 2
 
 ssize_t xor(const uint8_t *left, size_t left_len, const uint8_t *right, size_t right_len, uint8_t *output)
 {
@@ -115,4 +118,32 @@ ssize_t decipher_aes_128_ecb(const uint8_t *input, size_t input_len, const uint8
     EVP_CIPHER_CTX_free(ctx);
 
     return (ssize_t)output_len;
+}
+
+bool is_aes_ecb_encrypted(const uint8_t *input, size_t input_len)
+{
+    if (input_len % 16 != 0)
+        return false;
+
+    bool ret = false;
+    unsigned int dups = 0;
+    hashmap_s hm;
+    hashmap_init(&hm);
+    bool already_seen = false;
+    char chunk[17];
+    for (size_t i = 0; i < input_len; i += 16) {
+        memcpy(chunk, &input[i], 16);
+        chunk[16] = '\0';
+        hashmap_get(&hm, chunk, &already_seen);
+        if (already_seen) {
+            if(++dups >= ECB_ENCODING_DETECTION_DUPS_TRESHOLD) {
+                ret = true;
+                break;
+            }
+        } else {
+            hashmap_set(&hm, chunk, NULL, 0);
+        }
+    }
+    hashmap_finalize(&hm);
+    return ret;
 }
